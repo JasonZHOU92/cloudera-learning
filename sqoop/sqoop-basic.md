@@ -66,7 +66,7 @@ sqoop import \
   --username root \
   --password cloudera \
   --table order_items \
-  --target-dir /user/jaszhou/sqoop_import/retail_db \
+  --warehouse-dir /user/jaszhou/sqoop_import/retail_db \
   --delete-target-dir
  ```
 
@@ -76,7 +76,7 @@ sqoop import \
   --username root \
   --password cloudera \
   --table order_items \
-  --target-dir /user/jaszhou/sqoop_import/retail_db \
+  --warehouse-dir /user/jaszhou/sqoop_import/retail_db \
   --append
 ```
 
@@ -88,7 +88,7 @@ sqoop import \
   --username root \
   --password cloudera \
   --table order_items \
-  --target-dir /user/jaszhou/sqoop_import/retail_db \
+  --warehouse-dir /user/jaszhou/sqoop_import/retail_db \
   --delete-target-dir \
   --num-mappers 1
 ```
@@ -101,7 +101,7 @@ sqoop import \
   --username root \
   --password cloudera \
   --table order_items \
-  --target-dir /user/jaszhou/sqoop_import/retail_db \
+  --warehouse-dir /user/jaszhou/sqoop_import/retail_db \
   --delete-target-dir \
   --num-mappers 6
 ```
@@ -115,11 +115,51 @@ sqoop import \
   --username root \
   --password cloudera \
   --table order_items_nopk \
-  --target-dir /user/jaszhou/sqoop_import/retail_db \
+  --warehouse-dir /user/jaszhou/sqoop_import/retail_db \
   --delete-target-dir \
   --num-mappers 6
 ```
 
 ```
 ERROR tool.ImportTool: Error during import: No primary key could be found for table order_items_nopk. Please specify one with --split-by or perform a sequential import with '-m 1'
+```
+
+// Things to remember for split-by
+// Column should be indexed
+// Select * from order_items_nopk where order_item_id >=1 and order_item_id < 43049
+// vlaues in the field should be sparse and also often it should be sequence generated or evenly incremented
+// it should not have null values
+```
+sqoop import \
+  --connect jdbc:mysql://localhost:3306/retail_db \
+  --username root \
+  --password cloudera \
+  --table order_items_nopk \
+  --warehouse-dir /user/jaszhou/sqoop_import/retail_db \
+  --delete-target-dir \
+  --num-mappers 6 \
+  --split-by order_item_id
+```
+
+mysql> desc orders;
++-------------------+-------------+------+-----+---------+----------------+
+| Field             | Type        | Null | Key | Default | Extra          |
++-------------------+-------------+------+-----+---------+----------------+
+| order_id          | int(11)     | NO   | PRI | NULL    | auto_increment |
+| order_date        | datetime    | NO   |     | NULL    |                |
+| order_customer_id | int(11)     | NO   |     | NULL    |                |
+| order_status      | varchar(45) | NO   |     | NULL    |                |
++-------------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+```
+sqoop import \
+  --connect jdbc:mysql://localhost:3306/retail_db \
+  --username root \
+  --password cloudera \
+  --table orders \
+  --warehouse-dir /user/jaszhou/sqoop_import/retail_db \
+  --delete-target-dir \
+  --num-mappers 6 \
+  --split-by order_status
 ```
