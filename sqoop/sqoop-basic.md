@@ -80,7 +80,7 @@ sqoop import \
   --append
 ```
 
-## Sqoop import with multiple mappers, columes should be indexed
+## Sqoop import with multiple mappers, columns should be indexed
 //--num-of-mappers number of mappers you want to use
 ```
 sqoop import \
