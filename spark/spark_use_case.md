@@ -28,14 +28,19 @@ val orders  = sc.textFile("/public/retail_db/orders")
 val orderItems  = sc.textFile("/public/retail_db/order_items")
 val products = scala.io.Source.fromFile("/data/retail_db/products")
 
+//(orderId, order)
 val orderByOrderId = orders.
   filter(order => (order.split(",")(3) == "COMPLETE" || orderItem.split(",")(3) == "CLOSED")).
   map( order => (order.split(",")(0), order))
+
+//(orderId, orderItem)
 val orderItemByOrderId = orderItems.
   map( orderItem => (orderItem.split(",")(1), orderItem))
 
+//(productId, (order, orderItem))
 val orderItemPerDatePerProductId =
   orderByOrderId.join(orderItemByOrderId).
+  //(productId, (date, subtotal))
   map{ rec =>
     val order = rec._2._1
     val orderItem = rec._2._2
@@ -47,29 +52,33 @@ val orderItemPerDatePerProductId =
     (productId, (date, subtotal))
   }
 
+//(productId, product)
 val productById = products.map( p => (p.split(",")(0).toInt, p))
 
+//(productId, ((date, subtotal), product))
 val orderItemPerDatePerProductName = orderItemPerDatePerProductId.join(productById).
+//((date, productName), subtotal)
   map{ rec =>
     val productName = rec._2._2.split(",")(2)
     val date = rec._2._1._1
     val subtotal = rec._2._1._2
     ((date, productName), subtotal)
+//((date, productName), revenue)
   }.reduceByKey( _ + _ )
 
-val resultRDD = orderItemPerDatePerProductName.map{ rec =>
-  val date = rec._1._1
-  val productName = rec._1._2
-  val revenue = rec._2
-  (date, (revenue, productName))
-}.sortByKey.map{ rec =>
-  rec._2.toList.sortBy(false)
-}.map {rec =>
-  (rec._1, rec._2._1, rec._2._2)
-}
+//((date, subtotal), (date, subtotal, productName))
+val resultRDD = orderItemPerDatePerProductName.map(
+    rec => ((rec._1._1, - rec._2), (rec._1._1, rec._1._2, rec._2 )
+  ).sortByKey
+  .(rec => rec._2)
 
-orderItemPerDatePerProductName.saveAsTextFile("hdfs:///user/jaszhou/daily_revenue_txt_scala")
+val finalRDD =  resultRDD.map(rec => rec._1 + "," + rec._2 + "," + rec._3)
 
+
+finalRDD.saveAsTextFile("hdfs:///user/jaszhou/daily_revenue_txt_scala")
+
+import spark.sqlContext.implicits._
+import spark.implicits._
 val resultDF = resultRDD.toDF("order_date", "daily_revenue_per_product", "product_name")
 resultDF.write.avro("/user/jaszhou/daily_revenue_avro_scala")
 
