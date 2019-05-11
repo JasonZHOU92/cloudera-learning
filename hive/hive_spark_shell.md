@@ -1,11 +1,13 @@
 # Hiva in spark-shell
 
 ## spark sql
-spark-shell --master yarn --conf spark.ui.port=12345
+`spark-shell --master yarn --conf spark.ui.port=12345`
 
+```
 scala > sc
 scala > sqlContext
-
+```
+```
 sqlContext.sql("create database jaszhou_retail_db_txt")
 sqlContext.sql("use jaszhou_retail_db_txt")
 sqlContext.sql("show tables").show
@@ -69,3 +71,5 @@ dailyRevenuePerProduct.saveAsSequenceFile("/public/data/solutions/daily_revenue_
 
 
 dailyRevenuePerProduct.select("order_date", "daily_revenue_per_product").filter(dailyRevenuePerProduct["order_date"] == "2019-05-10 00:00:00.0").count
+
+```
