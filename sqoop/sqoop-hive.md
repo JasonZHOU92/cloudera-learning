@@ -1,5 +1,5 @@
 
-#Sqoop hive Import
+# Sqoop hive Import
 
 ## create a hive database
 You need to create a hive database firstly
