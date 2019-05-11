@@ -61,6 +61,6 @@ core-site.xml  hadoop-metrics.properties  log4j.properties  README
 hadoop-env.sh  hdfs-site.xml              mapred-site.xml   yarn-site.xml
 ```
 
-org.apache.hadoop.io.compress.GZipCodec
-org.apache.hadoop.io.compress.DefaultCodec
-org.apache.hadoop.io.compress.SnappyCodec
+- org.apache.hadoop.io.compress.GZipCodec
+- org.apache.hadoop.io.compress.DefaultCodec
+- org.apache.hadoop.io.compress.SnappyCodec
