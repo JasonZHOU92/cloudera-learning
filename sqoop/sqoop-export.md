@@ -1,4 +1,4 @@
-#Sqoop export
+# Sqoop export
 
 ## Set up
 Import all tables into hive
