@@ -27,7 +27,7 @@ mysql>create table daily_revenue(order_date varchar(30), revenue float);
 
 
 ## Simple export
-
+```
 Input parsing arguments
 --input-enclosed-by <char>	Sets a required field encloser
 --input-escaped-by <char>	Sets the input escape character
@@ -42,7 +42,8 @@ Output line formatted arguments
 --lines-terminated-by <char>	Sets the end-of-line character
 --mysql-delimiters	Uses MySQL’s default delimiter set: fields: , lines: \n escaped-by: \ optionally-enclosed-by: '
 --optionally-enclosed-by <char>	Sets a field enclosing character
-
+```
+```
 sqoop export \
   --connect jdbc:mysql://localhost:3306/retail_db \
   --username root \
@@ -50,7 +51,7 @@ sqoop export \
   --export-dir /user/hive/warehouse/jaszhou_sqoop_import.db/daily_revenue \
   --table daily_revenue \
   --input-fields-terminated-by "\001"
-
+```
 ## Column export
 `mysql>create table daily_revenue_demo(order_date varchar(30), revenue float, description varchar(200));``
 ```
@@ -81,21 +82,25 @@ the missing field should be nullable, try with
 `mysql>create table daily_revenue_demo(order_date varchar(30), revenue float, description varchar(200) not null);``
 
 ## Insert and Update
-
+```
 hive> create table daily_revenue as
 select order_date, sum(order_item_subtotal) daily_revenue
 from orders join order_items on
 order_id = order_item_order_id
 where order_date like '2013-07%'
 group by order_date;
+```
 
+```
 hive> insert into table daily_revenue  
 select order_date, sum(order_item_subtotal) daily_revenue
 from orders join order_items on
 order_id = order_item_order_id
 where order_date like '2013-08%'
 group by order_date;
+```
 
+```
 mysql> update daily_revenue set revenue = 0;
 
 mysql> select * from daily_revenue;
@@ -110,7 +115,11 @@ mysql> select * from daily_revenue;
 | 2013-07-30 00:00:00.0 |       0 |
 | 2013-07-31 00:00:00.0 |       0 |
 +-----------------------+---------+
+```
 
+Note:  --update-key order_date
+
+```
 sqoop export \
   --connect jdbc:mysql://localhost:3306/retail_db \
   --username root \
@@ -120,6 +129,7 @@ sqoop export \
   --update-key order_date \
   --input-fields-terminated-by "\001" \
   --num-mappers 1
+
 
 mysql> select * from daily_revenue;
 +-----------------------+---------+
@@ -134,8 +144,11 @@ mysql> select * from daily_revenue;
 | 2013-07-31 00:00:00.0 |  131878 |
 +-----------------------+---------+
 7 rows in set (0.00 sec)
+```
 
+Note:   --update-mode allowinsert 
 
+```
 sqoop export \
   --connect jdbc:mysql://localhost:3306/retail_db \
   --username root \
@@ -198,7 +211,7 @@ mysql> select * from daily_revenue;
 | 2013-08-30 00:00:00.0 | 57008.5 |
 | 2013-08-31 00:00:00.0 | 75923.7 |
 +-----------------------+---------+
-
+```
 
 ## Staging table
 
