@@ -47,6 +47,7 @@ note:
 
 ## Spark Design: spark streaming
 
+```
 // FlumeStreamingDepartmentCount.scala
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.{StreamingContext, Seconds}
@@ -82,8 +83,11 @@ object FlumeStreamingDepartmentCount {
     ssc.awaitTermination()
   }
 }
-// build.sbt
+
 ```
+
+```
+// build.sbt
 name := "retail"
 version := "1.0"
 scalaVersion := "2.10.5"
